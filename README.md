@@ -1,10 +1,13 @@
 # web-terminal
 
-##Terminal through browser's window
+## Terminal through browser's window
 
-###Install & Usage
+### Install & Usage
 
-Just place term.php on your hosting and open it in your browser
+- get term.php
+- change users and passwords inside it 
+- upload it on your hosting 
+- open it in your browser
 
 ### Screenshot
 
