@@ -1,0 +1,16 @@
+{
+    "name": "ford-rt/html5terminal",
+    "description": "Terminal through browser's window",
+    "type": "project",
+    "license": "LGPL v3",
+    "authors": [
+        {
+            "name": "Joe Ford",
+            "email": "ford153focus@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+      "ext-json": "*"
+    }
+}
