@@ -9,11 +9,15 @@ $oneFile = file_get_contents('src/index.php');
  */
 echo('Replacing includes'."\n");
 
-preg_match_all("/(require|require_once|include|include_once)\('([A-Za-z0-9\.]+)'\);/", $oneFile, $matches);
-
-for ($i=0; $i<count($matches[0]); $i++)
+/** @TODO: proper path for require_once and include_once */
+preg_match_all("/(require|require_once|include|include_once)\('([A-Za-z0-9.]+)'\);/", $oneFile, $matches);
+for ($i=0, $iMax = count($matches[0]); $i < $iMax; $i++)
 {
-	$oneFile = str_replace($matches[0][$i], ' ?> '.file_get_contents('src/'.$matches[2][$i]).' <?php ', $oneFile);
+	$oneFile = str_replace(
+	    $matches[0][$i],
+        ' ?> '.file_get_contents('src/'.$matches[2][$i]).' <?php ',
+        $oneFile
+    );
 }
 
 /**
@@ -21,11 +25,16 @@ for ($i=0; $i<count($matches[0]); $i++)
  */
 echo('Replacing styles'."\n");
 
-preg_match_all('/<link rel="stylesheet" type="text\/css" href="([A-Za-z0-9:\/\.\-]+)">/', $oneFile, $matches);
+preg_match_all('/<link rel="stylesheet" type="text\/css" href="([A-Za-z0-9:\/.\-]+)">/', $oneFile, $matches);
 
-for ($i=0; $i<count($matches[0]); $i++)
+for ($i=0, $iMax = count($matches[0]); $i < $iMax; $i++)
 {
-	$css = strpos($matches[1][$i], 'http://') !== false ? file_get_contents($matches[1][$i]) : file_get_contents('src/'.$matches[1][$i]);
+	if (strpos($matches[1][$i], 'http://') || strpos($matches[1][$i], 'https://')) {
+        $css = file_get_contents($matches[1][$i]);
+    } else {
+        $css = file_get_contents('src/'.$matches[1][$i]);
+    }
+
 	$oneFile = str_replace($matches[0][$i], "<style>$css</style>", $oneFile);
 }
 
@@ -34,13 +43,20 @@ for ($i=0; $i<count($matches[0]); $i++)
  */
 echo('Replacing fonts'."\n");
 
-preg_match_all('/src:\surl\("([A-Za-z0-9:\/\.\-]+)"\);/', $oneFile, $matches);
+preg_match_all('/src:\surl\("([A-Za-z0-9:\/.\-]+)"\);/', $oneFile, $matches);
 
-for ($i=0; $i<count($matches[0]); $i++)
+for ($i=0, $iMax = count($matches[0]); $i < $iMax; $i++)
 {
-	$font = strpos($matches[1][$i], 'http://') !== false ? file_get_contents($matches[1][$i]) : file_get_contents('src/'.$matches[1][$i]);
+    if (strpos($matches[1][$i], 'http://') || strpos($matches[1][$i], 'https://')) {
+        $font = file_get_contents($matches[1][$i]);
+    } else {
+        $font = file_get_contents('src/'.$matches[1][$i]);
+    }
+
 	$font = base64_encode($font);
-	$oneFile = str_replace($matches[0][$i], "src: url(data:font/ttf;base64,$font)", $oneFile);
+    $font = "src: url(data:font/ttf;base64,$font)";
+
+	$oneFile = str_replace($matches[0][$i], $font, $oneFile);
 }
 
 /**
@@ -48,14 +64,19 @@ for ($i=0; $i<count($matches[0]); $i++)
  */
 echo('Replacing scripts'."\n");
 
-preg_match_all('/<script src="([A-Za-z0-9:\/\.\-]+)"><\/script>/', $oneFile, $matches);
+preg_match_all('/<script src="([A-Za-z0-9:\/.\-]+)"><\/script>/', $oneFile, $matches);
 
-for ($i=0; $i<count($matches[0]); $i++)
+for ($i=0, $iMax = count($matches[0]); $i < $iMax; $i++)
 {
-	$script = strpos($matches[1][$i], 'http://') !== false ? file_get_contents($matches[1][$i]) : file_get_contents('src/'.$matches[1][$i]);
+    if (strpos($matches[1][$i], 'http://') || strpos($matches[1][$i], 'https://')) {
+        $script = file_get_contents($matches[1][$i]);
+    } else {
+        $script = file_get_contents('src/'.$matches[1][$i]);
+    }
+
 	$oneFile = str_replace($matches[0][$i], "<script>$script</script>", $oneFile);
 }
 
-var_dump($oneFile);
+print_r($oneFile);
 
 file_put_contents('term.php', $oneFile);
